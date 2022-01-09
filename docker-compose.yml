@@ -1,0 +1,7 @@
+version: '3'
+services:
+  memcached:
+    image: 'docker.io/memcached'
+    ports:
+      - "11211:11211"
+
