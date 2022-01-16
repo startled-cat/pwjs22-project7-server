@@ -4,4 +4,8 @@ services:
     image: 'docker.io/memcached'
     ports:
       - "11211:11211"
+    entrypoint:
+      - memcached
+      - -m 2048
+
 
