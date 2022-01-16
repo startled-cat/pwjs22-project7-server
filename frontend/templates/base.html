@@ -1,0 +1,11 @@
+{%- extends "bootstrap/base.html" %}
+{% block title %}Pc Web Monitor{% endblock %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{%- endblock %}
+{% block styles -%}
+{{super()}}
+<a href="/">Home</a>
+{% endblock %}
