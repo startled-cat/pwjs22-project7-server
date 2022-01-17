@@ -125,5 +125,5 @@ class Cache:
                         for i in range(0, len(keys), chunk_size)]
         result = {}
         for chunk in chunked_keys:
-            result = result | self._client.get_many(chunk)
+            result = {**result, **self._client.get_many(chunk)}
         return result
