@@ -41,72 +41,75 @@ def get_pc_dataEntries(pcname, lasthours):
 
 @app.route('/pc/<pcname>/<int:lasthours>/graph/<resourcetype>', methods=['GET'])
 def get_pc_graph(pcname, lasthours, resourcetype=resource_types[0]):
-
-    cache = mc.Cache()
-    data = cache.get_pc_data(pcname, lasthours)
-
     graphFilename = f'img/{pcname}_{resourcetype}_-{lasthours}h.png'
+    try:
+        cache = mc.Cache()
+        data = cache.get_pc_data(pcname, lasthours)
 
-    dataList = list(data.items())
-    systemInfoEntries = [x[1] for x in dataList]
+        
 
-    timestamps = [datetime.strptime(x['time'][0:19].replace(
-        "T", " "), '%Y-%m-%d %H:%M:%S') for x in systemInfoEntries]
-    dates = [datetime.strptime(f"{x['time'][0:10]}T00:00:00".replace(
-        "T", " "), '%Y-%m-%d %H:%M:%S') for x in systemInfoEntries]
-    dates_h = [datetime.strptime(f"{x['time'][0:13]}:00:00".replace(
-        "T", " "), '%Y-%m-%d %H:%M:%S') for x in systemInfoEntries]
-    # times = [x['time'][10:15] for x in systemInfoEntries]
+        dataList = list(data.items())
+        systemInfoEntries = [x[1] for x in dataList]
 
-    df = pd.DataFrame(
-        {
-            'timestamp': timestamps,
-            'date': dates,
-            'date_h': dates_h,
-            # 'time':times,
-            resource_types[0]: [x['cpu']['total'] for x in systemInfoEntries],
-            resource_types[1]: [(x['memory']['used'] / x['memory']['total'])*100 for x in systemInfoEntries],
-            resource_types[2]: [x['gpus'][0]['load'] for x in systemInfoEntries],
-            resource_types[3]: [x['gpus'][0]['temp'] for x in systemInfoEntries],
-            resource_types[4]: [x['gpus'][0]['memory']['used'] / x['gpus'][0]['memory']['total'] for x in systemInfoEntries],
-        })
+        timestamps = [datetime.strptime(x['time'][0:19].replace(
+            "T", " "), '%Y-%m-%d %H:%M:%S') for x in systemInfoEntries]
+        dates = [datetime.strptime(f"{x['time'][0:10]}T00:00:00".replace(
+            "T", " "), '%Y-%m-%d %H:%M:%S') for x in systemInfoEntries]
+        dates_h = [datetime.strptime(f"{x['time'][0:13]}:00:00".replace(
+            "T", " "), '%Y-%m-%d %H:%M:%S') for x in systemInfoEntries]
+        # times = [x['time'][10:15] for x in systemInfoEntries]
 
-    fig, ax = plt.subplots()
-    fig.autofmt_xdate()
-    unit = ''
-    duration = ''
+        df = pd.DataFrame(
+            {
+                'timestamp': timestamps,
+                'date': dates,
+                'date_h': dates_h,
+                # 'time':times,
+                resource_types[0]: [x['cpu']['total'] for x in systemInfoEntries],
+                resource_types[1]: [(x['memory']['used'] / x['memory']['total'])*100 for x in systemInfoEntries],
+                resource_types[2]: [x['gpus'][0]['load'] for x in systemInfoEntries],
+                resource_types[3]: [x['gpus'][0]['temp'] for x in systemInfoEntries],
+                resource_types[4]: [x['gpus'][0]['memory']['used'] / x['gpus'][0]['memory']['total'] for x in systemInfoEntries],
+            })
 
-    if lasthours < 24:
-        duration = f"{lasthours}h"
-    else:
-        duration = f"{lasthours//24}d"
+        fig, ax = plt.subplots()
+        fig.autofmt_xdate()
+        unit = ''
+        duration = ''
 
-    if 'temp' in resourcetype:
-        unit = '[C]'
-    if 'load' in resourcetype:
-        ax.set_ylim(0, 100)
-        unit = '[%]'
+        if lasthours < 24:
+            duration = f"{lasthours}h"
+        else:
+            duration = f"{lasthours//24}d"
 
-    ax.set(xlabel='', ylabel=f'{resourcetype} {unit}',
-           title=f'{resourcetype} of {pcname} in last {duration}')
+        if 'temp' in resourcetype:
+            unit = '[C]'
+        if 'load' in resourcetype:
+            ax.set_ylim(0, 100)
+            unit = '[%]'
 
-    if len(df) > 1000:
-        df = df.groupby('date_h').mean().reset_index()
-        ax.plot(df['date_h'], df[resourcetype])
-    else:
-        ax.plot(df['timestamp'], df[resourcetype])
+        ax.set(xlabel='', ylabel=f'{resourcetype} {unit}',
+            title=f'{resourcetype} of {pcname} in last {duration}')
 
-    ax.grid()
+        if len(df) > 1000:
+            df = df.groupby('date_h').mean().reset_index()
+            ax.plot(df['date_h'], df[resourcetype])
+        else:
+            ax.plot(df['timestamp'], df[resourcetype])
 
-    if lasthours < 24:
-        xfmt = mdates.DateFormatter('%H:%M')
-    else:
-        xfmt = mdates.DateFormatter('%m-%d %H:%M')
+        ax.grid()
 
-    ax.xaxis.set_major_formatter(xfmt)
+        if lasthours < 24:
+            xfmt = mdates.DateFormatter('%H:%M')
+        else:
+            xfmt = mdates.DateFormatter('%m-%d %H:%M')
 
-    plt.savefig(graphFilename)
-    return send_file(graphFilename, mimetype='image/png')
+        ax.xaxis.set_major_formatter(xfmt)
+
+        plt.savefig(graphFilename)
+        return send_file(graphFilename, mimetype='image/png')
+    except:
+        return send_file(graphFilename, mimetype='image/png')
 
 
 @app.route('/cache/populate', methods=['GET'])
@@ -134,11 +137,14 @@ def get_index():
     if all_pcs is None:
         all_pcs = []
         
-    print(f" pc = {pc}")
-    if pc:
+    
+    if pc is not None:
         pc_info = cache.get_pc_data_latest_entry(pc)
     else:
         pc_info = {}
+        
+    # print(f" pc = {pc}")
+    # print(f" pc_info = {pc_info}")
     
 
     return render_template('index.html', all_pcs=all_pcs, pc=pc, pc_info=pc_info, view=view, resource=resource, resource_types=resource_types)

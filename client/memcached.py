@@ -64,6 +64,8 @@ class Cache:
                 else:
                     if self._client.cas(PCS_KEY, pcs, cas):
                         break
+            else:
+                break
 
     def add_stats(self, pcname, value):
         now_iso = datetime.utcnow().isoformat()
@@ -72,17 +74,24 @@ class Cache:
             keys, cas = self._client.gets(pcname)
             if keys is None:
                 keys = []
-            if key not in keys:
-                value['time'] = now_iso
-                value['key'] = key
-                keys.append(key)
+            if key in keys:
+                return None
+                
+            value['time'] = now_iso
+            value['key'] = key
+            keys.append(key)
+            self._client.set(key, value)
+
+            
+            if cas is None:
                 self._client.set(pcname, keys)
-
-                if cas is None:
-                    self._client.set(key, value)
-                    break
-                else:
-                    if self._client.cas(key, value, cas):
-                        break
-
+                print(f"data sent")
                 return value
+            else:
+                if self._client.cas(pcname, keys, cas):
+                    print(f"data sent")
+                    return value
+                else:
+                    continue
+                
+            

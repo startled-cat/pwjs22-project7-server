@@ -115,8 +115,8 @@ if __name__ == '__main__':
     while True:
         data = getPcStats()
         cache.add_pc(PC_KEY)
-        cache.add_stats(PC_KEY, data)
-        print(f"sent info, memcached key: {data['key']}")
+        data = cache.add_stats(PC_KEY, data)
+        print(f"memcached key: {data['key']}")
 
         if not loppForEver:
             break

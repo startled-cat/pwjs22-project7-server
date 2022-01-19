@@ -21,18 +21,22 @@
     <script>
         window.onload = function () {
             var image = document.getElementById("chart-image");
+            var check = document.getElementById("refresh-checkbox");
 
             function updateImage() {
-                console.log('updateImage');
-                image.src = image.src.split("?")[0] + "?" + new Date().getTime();
+                if (check.checked) {
+                    image.src = image.src.split("?")[0] + "?" + new Date().getTime();
+                }
+
             }
 
-            setInterval(updateImage, 1000);
+            setInterval(updateImage, 3000);
         }
     </script>
 </head>
 
 <body>
+
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand"
@@ -87,7 +91,7 @@
                        href="/cache/clear">Clear all data </a>
                 </li>
 
-                
+
 
             </ul>
 
@@ -129,6 +133,9 @@
                 </div>
             </div>
             <div class="col">
+
+
+
                 <div class="btn-group"
                      role="group"
                      aria-label="Basic example">
@@ -140,19 +147,33 @@
 
                 </div>
             </div>
+            <div class="col">
+                <div class="form-check form-switch">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="refresh-checkbox">
+                    <label class="form-check-label"
+                           for="refresh-checkbox">Auto refresh</label>
+                </div>
+            </div>
+
         </div>
+
         <div class="row p-1">
             <div class="col-sm">
             </div>
             <div class="col-sm">
                 {% if view == 1 %}
-                <img id="chart-image" src="/pc/{{ pc }}/1/graph/{{ resource }}"></img>
+                <img id="chart-image"
+                     src="/pc/{{ pc }}/1/graph/{{ resource }}"></img>
                 {% endif %}
                 {% if view == 2 %}
-                <img id="chart-image" src="/pc/{{ pc }}/24/graph/{{ resource }}"></img>
+                <img id="chart-image"
+                     src="/pc/{{ pc }}/24/graph/{{ resource }}"></img>
                 {% endif %}
                 {% if view == 3 %}
-                <img id="chart-image" src="/pc/{{ pc }}/168/graph/{{ resource }}"></img>
+                <img id="chart-image"
+                     src="/pc/{{ pc }}/168/graph/{{ resource }}"></img>
                 {% endif %}
             </div>
             <div class="col-sm">

@@ -117,22 +117,27 @@ class Cache:
             self._client.set(pc, pc_data_keys)
 
     def get_pcs(self):
-        return self._client.get(PCS_KEY)
+        pcs, cas = self._client.gets(PCS_KEY)
+        return pcs
 
     def get_pc_keys(self, pcname):
-        return self._client.get(pcname)
+        keys, cas = self._client.gets(pcname)
+        return keys
     
     def get_pc_data_latest_entry(self, pcname):
+        print("get_pc_data_latest_entry")
         keys = self._client.get(pcname)
-        if keys:
-            if len(keys) > 0:
-                key = keys[len(keys)-1]
-                result = self._client.get(key)
-                return result
+        print(f"{len(keys)=}")
+        if keys and len(keys) > 0:
+            key = keys[0]
+            print(f"{key=}")
+            result = self._client.get(key)
+            print(f"{result=}")
+            return result
         return {}
 
     def get_pc_data(self, pcname, fromLastHours=1):
-        keys = self._client.get(pcname)
+        keys, cas = self._client.gets(pcname)
         n = datetime.datetime.utcnow()
         d = timedelta(hours=fromLastHours, minutes=0)
         fromDatetime = n - d
