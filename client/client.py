@@ -110,10 +110,11 @@ if __name__ == '__main__':
         pass
 
 
-    cache.add_pc(PC_KEY)
+    
 
     while True:
         data = getPcStats()
+        cache.add_pc(PC_KEY)
         cache.add_stats(PC_KEY, data)
         print(f"sent info, memcached key: {data['key']}")
 

@@ -1,11 +1,9 @@
 from pymemcache import serde
 from pymemcache.client import base
 import json
-import time
-import random
 import base64
 import bz2
-from datetime import timedelta, datetime
+from datetime import datetime
 MC_ADDRESS = 'localhost'
 MC_PORT = 11211
 PCS_KEY = 'pcs'
@@ -53,32 +51,38 @@ class Cache:
         print("success")
         return client
 
-    def get_pcs(self):
-        return self._client.get(PCS_KEY)
-
-    def get_pc_keys(self, pcname):
-        return self._client.get(pcname)
-    
     def add_pc(self, pcname):
-        pcs = self._client.get(PCS_KEY)
-        if pcs is None:
-            pcs = []
-        if pcname not in pcs:
-            pcs.append(pcname)
-            self._client.set(PCS_KEY, pcs)
-        
-    
+        while True:
+            pcs, cas = self._client.gets(PCS_KEY)
+            if pcs is None:
+                pcs = []
+            if pcname not in pcs:
+                pcs.append(pcname)
+                if cas is None:
+                    self._client.set(PCS_KEY, pcs)
+                    break
+                else:
+                    if self._client.cas(PCS_KEY, pcs, cas):
+                        break
+
     def add_stats(self, pcname, value):
         now_iso = datetime.utcnow().isoformat()
         key = f"{pcname}/{now_iso}"
-        keys = self._client.get(pcname)
-        if keys is None:
-            keys = []
-        if key not in keys:
-            value['time'] = now_iso
-            value['key'] = key
-            keys.append(key)
-            self._client.set(pcname, keys)
-            self._client.set(key, value)
-            return value
-        
+        while True:
+            keys, cas = self._client.gets(pcname)
+            if keys is None:
+                keys = []
+            if key not in keys:
+                value['time'] = now_iso
+                value['key'] = key
+                keys.append(key)
+                self._client.set(pcname, keys)
+
+                if cas is None:
+                    self._client.set(key, value)
+                    break
+                else:
+                    if self._client.cas(key, value, cas):
+                        break
+
+                return value

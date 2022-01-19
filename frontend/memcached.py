@@ -86,11 +86,23 @@ class Cache:
                     "total": 32*1024,
                     "available": 16*1024,
                     "used": random.randrange(3, 5)*1024
-                }
+                },
+                "gpus": [
+                    {
+                        "id" : 0,
+                        "name" :"example gpu",
+                        "load" :random.randrange(5, 35),
+                        "temp" : random.randrange(55, 105),
+                        "memory": {
+                            "total": 6*1024,
+                            "used": random.randrange(1, 4)*1024
+                        },
+                    }
+                ]
             }
             return data
-        self._client.flush_all()
-        sample_pcs = [f'pc-{i}' for i in range(3)]
+        # self._client.flush_all()
+        sample_pcs = [f'example-pc-{i}' for i in range(3)]
         self._client.set(PCS_KEY, sample_pcs)
         # generate sample data
         for pc in sample_pcs:
@@ -109,13 +121,21 @@ class Cache:
 
     def get_pc_keys(self, pcname):
         return self._client.get(pcname)
+    
+    def get_pc_data_latest_entry(self, pcname):
+        keys = self._client.get(pcname)
+        if keys:
+            if len(keys) > 0:
+                key = keys[len(keys)-1]
+                result = self._client.get(key)
+                return result
+        return {}
 
     def get_pc_data(self, pcname, fromLastHours=1):
         keys = self._client.get(pcname)
         n = datetime.datetime.utcnow()
         d = timedelta(hours=fromLastHours, minutes=0)
         fromDatetime = n - d
-
 
         keys = list(filter(lambda x:
                            datetime.datetime.fromisoformat(x.split('/')[1]) > fromDatetime, keys))
