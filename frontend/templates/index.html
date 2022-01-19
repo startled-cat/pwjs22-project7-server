@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <link rel="shortcut icon"
+          href="{{ url_for('static', filename='favicon.ico') }}">
+
+
+    <title>PC Web Monitor</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand"
+           href="#">
+            <img src="/static/icon.png"
+                 width="30"
+                 height="30"
+                 class="d-inline-block align-top"
+                 alt="">
+                 PC Web Montior
+        </a>
+        <button class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       id="navbarDropdown"
+                       role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="false">
+                        Select pc
+                    </a>
+                    <div class="dropdown-menu"
+                         aria-labelledby="navbarDropdown">
+                        {% for pcname in all_pcs %}
+                        <a class="dropdown-item"
+                           href="/?pc={{ pcname }}">{{ pcname }}</a>
+                        {% endfor %}
+
+                    </div>
+                </li>
+
+            </ul>
+
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if pc %}
+        <div class="row">
+            <div class="col">
+                <h1>{{ pc }}</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="btn-group"
+                     role="group"
+                     aria-label="Basic example">
+                    <button type="button"
+                            class="btn btn-secondary {% if view == 1 %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view=1&resource={{ resource }}');">Last 1h</button>
+                    <button type="button"
+                            class="btn btn-secondary {% if view == 2 %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view=2&resource={{ resource }}');">Today</button>
+                    <button type="button"
+                            class="btn btn-secondary {% if view == 3 %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view=3&resource={{ resource }}');">This week</button>
+                </div>
+            </div><div class="col">
+                <div class="btn-group"
+                     role="group"
+                     aria-label="Basic example">
+                    <button type="button"
+                            class="btn btn-secondary {% if resource == 'cpu' %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view={{ view }}&resource=cpu');">CPU</button>
+                    <button type="button"
+                            class="btn btn-secondary {% if resource == 'mem' %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view={{ view }}&resource=mem');">MEM</button>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+            </div>
+            <div class="col-sm">
+                {% if view == 1 %}
+                <img src="/pc/{{ pc }}/1/graph/{{ resource }}"></img>
+                {% endif %}
+                {% if view == 2 %}
+                <img src="/pc/{{ pc }}/24/graph/{{ resource }}"></img>
+                {% endif %}
+                {% if view == 3 %}
+                <img src="/pc/{{ pc }}/168/graph/{{ resource }}"></img>
+                {% endif %}
+            </div>
+            <div class="col-sm">
+            </div>
+        </div>
+
+
+        {% else %}
+        choose pc from dropdown in navbar
+        {% endif %}
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+</body>
+
+</html>
