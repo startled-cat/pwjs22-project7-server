@@ -1,0 +1,1 @@
+{"system": {"system": "Linux", "name": "ps-VirtualBox", "version": "#42~20.04.1-Ubuntu SMP Tue Sep 28 20:41:07 UTC 2021", "machine": "x86_64", "boot": "2022/1/17 18:14:51"}, "cpu": {"cores": 1, "logical_cores": 1, "usage": {"0": 12.8}, "total": 14.6}, "memory": {"total": 2081734656, "available": 608546816, "used": 1261355008}}
