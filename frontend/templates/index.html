@@ -2,208 +2,225 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-          crossorigin="anonymous">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
 
-    <link rel="shortcut icon"
-          href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="shortcut icon"
+        href="{{ url_for('static', filename='favicon.ico') }}">
 
 
-    <title>PC Web Monitor</title>
-    <script>
-        window.onload = function () {
-            var images = document.querySelectorAll(".chart-image");
-            var check = document.getElementById("refresh-checkbox");
+  <title>PC Web Monitor</title>
+  <script>
 
-            function updateImage() {
-                if (check.checked) {
-                    images.forEach(image => {
-                        image.src = image.src.split("&")[0] + "&" + new Date().getTime();
 
-                    })
-                }
+    window.onload = function () {
 
-            }
+      var check = document.getElementById("refresh-checkbox");
 
-            setInterval(updateImage, 3000);
-        }
-    </script>
-    <style>
-        .chart-image {
-            width: 100%;
-            height: 100%;
+      function updateImage() {
+        document.querySelectorAll(".chart-image").forEach(x => {
+          x.src = x.src.split("&")[0] + "&" + new Date().getTime();
+        })
+      }
 
-        }
-    </style>
+      var update = updateImage;
+
+      setInterval(() => {
+        if (check.checked) { updateImage() };
+      }, 10000);
+    }
+
+  </script>
+  <style>
+    .chart-image {
+      width: 100%;
+      height: 100%;
+
+    }
+  </style>
 </head>
 
 <body>
 
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand"
-           href="#">
-            <img src="/static/icon.png"
-                 width="30"
-                 height="30"
-                 class="d-inline-block align-top"
-                 alt="">
-            PC Web Montior
-        </a>
-        <button class="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand"
+       href="#">
+      <img src="/static/icon.png"
+           width="30"
+           height="30"
+           class="d-inline-block align-top"
+           alt="">
+      PC Web Montior
+    </a>
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <div class="collapse navbar-collapse"
-             id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+    <div class="collapse navbar-collapse"
+         id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       href="#"
-                       id="navbarDropdown"
-                       role="button"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="false">
-                        Select pc
-                    </a>
-                    <div class="dropdown-menu"
-                         aria-labelledby="navbarDropdown">
-                        {% for pcname in all_pcs %}
-                        <a class="dropdown-item"
-                           href="/?pc={{ pcname }}">{{ pcname }}</a>
-                        {% endfor %}
-
-                    </div>
-                </li>
-
-                <li class="nav-item active">
-                    <a class="nav-link"
-                       href="/cache/populate">Generate sample data </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link"
-                       href="/cache/clear">Clear all data </a>
-                </li>
-
-
-
-            </ul>
-
-        </div>
-    </nav>
-
-    <div class="container">
-        {% if pc and pc_info %}
-        <div class="row">
-            <div class="col">
-                <h1>{{ pc }}</h1>
-                <p>
-                    <span class="badge badge-secondary">OS: {{ pc_info['system']['system'] }} {{
-                        pc_info['system']['version'] }}</span>
-                    <span class="badge badge-secondary">boot: {{ pc_info['system']['boot'] }}</span>
-                    <span class="badge badge-secondary">cpu: {{ pc_info['cpu']['cores'] }}C/{{
-                        pc_info['cpu']['logical_cores'] }}T</span>
-                    <span class="badge badge-secondary">memory: {{ pc_info['memory']['total'] //(1024*1024) }}MB</span>
-                    <span class="badge badge-secondary">gpu:
-                        {% if pc_info['gpus']|length > 0 %}
-                        {{ pc_info['gpus'][0]['name']}}
-                        {% else %}
-                        [missing]
-                        {% endif %}
-                    </span>
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="btn-group"
-                     role="group"
-                     aria-label="Basic example">
-                    <button type="button"
-                            class="btn btn-secondary {% if view == 1 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=1{% if resource %}&resource={{ resource }}{%endif%}');">Last
-                        1h</button>
-                    <button type="button"
-                            class="btn btn-secondary {% if view == 24 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=24{% if resource %}&resource={{ resource }}{%endif%}');">Today</button>
-                    <button type="button"
-                            class="btn btn-secondary {% if view == 168 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=168{% if resource %}&resource={{ resource }}{%endif%}');">This
-                        week</button>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="form-check form-switch">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           id="refresh-checkbox">
-                    <label class="form-check-label"
-                           for="refresh-checkbox">Auto refresh</label>
-                </div>
-            </div>
-
-        </div>
-
-
-
-        {% else %}
-        choose pc from dropdown in navbar
-        {% endif %}
-
-    </div>
-    <div class="container-fluid">
-        <div class="row p-0">
-            {% if resource %}
-            <div class="col-12 p-0">
-                <a href="/?pc={{ pc }}&view={{view}}">
-                    <img class="chart-image"
-                         src="/pc/{{ pc }}/graph/{{ resource }}?lasthours={{view}}"></img>
-                </a>
-            </div>
-            {% else %}
-            {% for resource_type in resource_types %}
-            <div class="col-xl-6 col-md-6 col-sm-12 p-0">
-                <a href="/?pc={{ pc }}&view={{view}}&resource={{ resource_type }}">
-                    <img class="chart-image"
-                         src="/pc/{{ pc }}/graph/{{ resource_type }}?lasthours={{view}}"></img>
-                </a>
-            </div>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-toggle="dropdown"
+             aria-haspopup="true"
+             aria-expanded="false">
+            Select pc
+          </a>
+          <div class="dropdown-menu"
+               aria-labelledby="navbarDropdown">
+            {% for pcname in all_pcs %}
+            <a class="dropdown-item"
+               href="/?pc={{ pcname }}">{{ pcname }}</a>
             {% endfor %}
-            {%endif %}
 
+          </div>
+        </li>
+
+        <li class="nav-item active">
+          <a class="nav-link"
+             href="/cache/populate">Generate sample data </a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link"
+             href="/cache/clear">Clear all data </a>
+        </li>
+
+
+
+      </ul>
+
+    </div>
+  </nav>
+
+  <div class="container">
+    {% if pc and pc_info %}
+    <div class="row">
+      <div class="col">
+        <h1>{{ pc }}</h1>
+        <p>
+          <span class="badge badge-secondary">OS: {{ pc_info['system']['system'] }} {{
+            pc_info['system']['version'] }}</span>
+          <span class="badge badge-secondary">boot: {{ pc_info['system']['boot'] }}</span>
+          <span class="badge badge-secondary">cpu: {{ pc_info['cpu']['cores'] }}C/{{
+            pc_info['cpu']['logical_cores'] }}T</span>
+          <span class="badge badge-secondary">memory: {{ pc_info['memory']['total'] //(1024*1024) }}MB</span>
+          <span class="badge badge-secondary">gpu:
+            {% if pc_info['gpus']|length > 0 %}
+            {{ pc_info['gpus'][0]['name']}}
+            {% else %}
+            [missing]
+            {% endif %}
+          </span>
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="btn-group"
+             role="group"
+             aria-label="Basic example">
+          <button type="button"
+                  class="btn btn-secondary {% if view == 1 %}active{% endif %}"
+                  onclick="window.location.assign('/?pc={{ pc }}&view=1{% if resource %}&resource={{ resource }}{%endif%}');">Last
+            1h</button>
+          <button type="button"
+                  class="btn btn-secondary {% if view == 24 %}active{% endif %}"
+                  onclick="window.location.assign('/?pc={{ pc }}&view=24{% if resource %}&resource={{ resource }}{%endif%}');">Today</button>
+          <button type="button"
+                  class="btn btn-secondary {% if view == 168 %}active{% endif %}"
+                  onclick="window.location.assign('/?pc={{ pc }}&view=168{% if resource %}&resource={{ resource }}{%endif%}');">This
+            week</button>
         </div>
+      </div>
+
+      <div class="col">
+
+
+        <form class="form-check-inline">
+          <div class="form-group">
+            <button type="button"
+                  class="btn btn-secondary"
+                  onclick="
+                        document.querySelectorAll('.chart-image').forEach(x=> {x.src = x.src.split('&')[0] + '&' + new Date().getTime();})">Refresh
+            now</button>
+          </div>
+          <div class="form-group form-check form-switch">
+            <input class="form-check-input"
+                 type="checkbox"
+                 id="refresh-checkbox">
+          <label class="form-check-label"
+                 for="refresh-checkbox">Auto refresh</label>
+          </div>
+        </form>
+
+
+
+      </div>
+
     </div>
 
 
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
+    {% else %}
+    choose pc from dropdown in navbar
+    {% endif %}
+
+  </div>
+  <div class="container-fluid">
+    <div class="row p-0">
+      {% if resource %}
+      <div class="col-12 p-0">
+        <a href="/?pc={{ pc }}&view={{view}}">
+          <img class="chart-image"
+               src="/pc/{{ pc }}/graph/{{ resource }}?lasthours={{view}}"></img>
+        </a>
+      </div>
+      {% else %}
+      {% for resource_type in resource_types %}
+      <div class="col-xl-6 col-md-6 col-sm-12 p-0">
+        <a href="/?pc={{ pc }}&view={{view}}&resource={{ resource_type }}">
+          <img class="chart-image"
+               src="/pc/{{ pc }}/graph/{{ resource_type }}?lasthours={{view}}"></img>
+        </a>
+      </div>
+      {% endfor %}
+      {%endif %}
+
+    </div>
+  </div>
+
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+          integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+          integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+          crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+          integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+          crossorigin="anonymous"></script>
 </body>
 
 </html>

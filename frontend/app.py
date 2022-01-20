@@ -85,54 +85,53 @@ def get_pc_stats(pcname):
 def get_pc_graph(pcname, resourcetype=resource_types[0]):
     lasthours = request.args.get("lasthours", 1, type=int)
     graphFilename = f'img/{pcname}_{resourcetype}_-{lasthours}h.svg'
-    try:
 
-        df = get_pc_stats_df(pcname, lasthours)
+    df = get_pc_stats_df(pcname, lasthours)
 
-        fig, ax = plt.subplots()
-        fig.autofmt_xdate()
-        # plt.tight_layout()
-        unit = ''
-        duration = ''
+    fig, ax = plt.subplots()
+    fig.autofmt_xdate()
+    # plt.tight_layout()
+    unit = ''
+    duration = ''
 
-        if lasthours < 24:
-            duration = f"{lasthours}h"
-        else:
-            duration = f"{lasthours//24}d"
+    if lasthours < 24:
+        duration = f"{lasthours}h"
+    else:
+        duration = f"{lasthours//24}d"
 
-        if 'temp' in resourcetype:
-            unit = '[C]'
-        if 'load' in resourcetype:
-            ax.set_ylim(0, 100)
-            unit = '[%]'
-        # ylabel=f'{resourcetype} {unit}', xlabel='',
-        ax.set(
-            title=f'{resourcetype} of {pcname} in last {duration}')
+    if 'temp' in resourcetype:
+        unit = '[C]'
+    if 'load' in resourcetype:
+        ax.set_ylim(0, 100)
+        unit = '[%]'
+    # ylabel=f'{resourcetype} {unit}', xlabel='',
+    ax.set(
+        title=f'{resourcetype} of {pcname} in last {duration}')
 
-        if len(df) > 1000:
-            df = df.groupby('date_h').mean().reset_index()
-            ax.plot(df['date_h'], df[resourcetype])
-        else:
-            ax.plot(df['timestamp'], df[resourcetype])
+    if len(df) > 1000:
+        df = df.groupby('date_h').mean().reset_index()
+        ax.plot(df['date_h'], df[resourcetype])
+    else:
+        ax.plot(df['timestamp'], df[resourcetype])
 
-        ax.grid()
+    ax.grid()
 
-        if lasthours < 24:
-            xfmt = mdates.DateFormatter('%H:%M')
-        else:
-            xfmt = mdates.DateFormatter('%m-%d %H:%M')
+    if lasthours < 24:
+        xfmt = mdates.DateFormatter('%H:%M')
+    else:
+        xfmt = mdates.DateFormatter('%m-%d %H:%M')
 
-        ax.xaxis.set_major_formatter(xfmt)
+    ax.xaxis.set_major_formatter(xfmt)
 
-        plt.savefig(graphFilename)
-        # output = io.BytesIO()
-        # FigureCanvas(fig).print_png(output)
-        # return Response(output.getvalue(), mimetype='image/png')
+    # plt.savefig(graphFilename)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
 
 
-        return send_file(graphFilename, mimetype='image/svg+xml')
-    except:
-        return send_file(graphFilename, mimetype='image/svg+xml')
+    # return send_file(graphFilename, mimetype='image/svg+xml')
+
+    # return send_file(graphFilename, mimetype='image/svg+xml')
 
 
 @app.route('/cache/populate', methods=['GET'])
