@@ -26,7 +26,7 @@
             function updateImage() {
                 if (check.checked) {
                     images.forEach(image => {
-                        image.src = image.src.split("?")[0] + "?" + new Date().getTime();
+                        image.src = image.src.split("&")[0] + "&" + new Date().getTime();
 
                     })
                 }
@@ -36,6 +36,13 @@
             setInterval(updateImage, 3000);
         }
     </script>
+    <style>
+        .chart-image {
+            width: 100%;
+            height: 100%;
+
+        }
+    </style>
 </head>
 
 <body>
@@ -130,14 +137,14 @@
                      aria-label="Basic example">
                     <button type="button"
                             class="btn btn-secondary {% if view == 1 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=1&resource={{ resource }}');">Last
+                            onclick="window.location.assign('/?pc={{ pc }}&view=1{% if resource %}&resource={{ resource }}{%endif%}');">Last
                         1h</button>
                     <button type="button"
                             class="btn btn-secondary {% if view == 24 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=24&resource={{ resource }}');">Today</button>
+                            onclick="window.location.assign('/?pc={{ pc }}&view=24{% if resource %}&resource={{ resource }}{%endif%}');">Today</button>
                     <button type="button"
                             class="btn btn-secondary {% if view == 168 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=168&resource={{ resource }}');">This
+                            onclick="window.location.assign('/?pc={{ pc }}&view=168{% if resource %}&resource={{ resource }}{%endif%}');">This
                         week</button>
                 </div>
             </div>
@@ -163,23 +170,24 @@
     </div>
     <div class="container-fluid">
         <div class="row p-0">
+            {% if resource %}
+            <div class="col-12 p-0">
+                <a href="/?pc={{ pc }}&view={{view}}">
+                    <img class="chart-image"
+                         src="/pc/{{ pc }}/graph/{{ resource }}?lasthours={{view}}"></img>
+                </a>
+            </div>
+            {% else %}
             {% for resource_type in resource_types %}
             <div class="col-xl-6 col-md-6 col-sm-12 p-0">
-                <a href="/pc/{{ pc }}/graph/{{ resource_type }}?lasthours={{view}}">
+                <a href="/?pc={{ pc }}&view={{view}}&resource={{ resource_type }}">
                     <img class="chart-image"
-                         style="max-width:100%;
-                max-height:100%"
                          src="/pc/{{ pc }}/graph/{{ resource_type }}?lasthours={{view}}"></img>
-
                 </a>
-
-
-
-
-
-
             </div>
             {% endfor %}
+            {%endif %}
+
         </div>
     </div>
 

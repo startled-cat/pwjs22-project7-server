@@ -84,7 +84,7 @@ def get_pc_stats(pcname):
 @app.route('/pc/<pcname>/graph/<resourcetype>', methods=['GET'])
 def get_pc_graph(pcname, resourcetype=resource_types[0]):
     lasthours = request.args.get("lasthours", 1, type=int)
-    graphFilename = f'img/{pcname}_{resourcetype}_-{lasthours}h.png'
+    graphFilename = f'img/{pcname}_{resourcetype}_-{lasthours}h.svg'
     try:
 
         df = get_pc_stats_df(pcname, lasthours)
@@ -125,12 +125,14 @@ def get_pc_graph(pcname, resourcetype=resource_types[0]):
         ax.xaxis.set_major_formatter(xfmt)
 
         plt.savefig(graphFilename)
-        output = io.BytesIO()
-        FigureCanvas(fig).print_png(output)
-        return Response(output.getvalue(), mimetype='image/png')
-        # return send_file(graphFilename, mimetype='image/png')
+        # output = io.BytesIO()
+        # FigureCanvas(fig).print_png(output)
+        # return Response(output.getvalue(), mimetype='image/png')
+
+
+        return send_file(graphFilename, mimetype='image/svg+xml')
     except:
-        return send_file(graphFilename, mimetype='image/png')
+        return send_file(graphFilename, mimetype='image/svg+xml')
 
 
 @app.route('/cache/populate', methods=['GET'])
@@ -153,7 +155,7 @@ def get_index():
     cache = mc.Cache()
     pc = request.args.get("pc")
     view = request.args.get("view", 1, type=int)
-    resource = request.args.get("resource", resource_types[0])
+    resource = request.args.get("resource")
     all_pcs = cache.get_pcs()
     if all_pcs is None:
         all_pcs = []
