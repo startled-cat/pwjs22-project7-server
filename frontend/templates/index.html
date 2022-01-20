@@ -110,7 +110,13 @@
                     <span class="badge badge-secondary">cpu: {{ pc_info['cpu']['cores'] }}C/{{
                         pc_info['cpu']['logical_cores'] }}T</span>
                     <span class="badge badge-secondary">memory: {{ pc_info['memory']['total'] //(1024*1024) }}MB</span>
-                    <span class="badge badge-secondary">gpu: {{ pc_info['gpus'][0]['name']}}</span>
+                    <span class="badge badge-secondary">gpu:
+                        {% if pc_info['gpus']|length > 0 %}
+                        {{ pc_info['gpus'][0]['name']}}
+                        {% else %}
+                        [missing]
+                        {% endif %}
+                    </span>
                 </p>
             </div>
         </div>
@@ -165,15 +171,15 @@
             <div class="col-sm">
                 {% if view == 1 %}
                 <img id="chart-image"
-                     src="/pc/{{ pc }}/1/graph/{{ resource }}"></img>
+                     src="/pc/{{ pc }}/graph/{{ resource }}?lasthours=1"></img>
                 {% endif %}
                 {% if view == 2 %}
                 <img id="chart-image"
-                     src="/pc/{{ pc }}/24/graph/{{ resource }}"></img>
+                     src="/pc/{{ pc }}/graph/{{ resource }}?lasthours=24"></img>
                 {% endif %}
                 {% if view == 3 %}
                 <img id="chart-image"
-                     src="/pc/{{ pc }}/168/graph/{{ resource }}"></img>
+                     src="/pc/{{ pc }}/graph/{{ resource }}?lasthours=168"></img>
                 {% endif %}
             </div>
             <div class="col-sm">

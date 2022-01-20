@@ -103,7 +103,11 @@ class Cache:
             return data
         # self._client.flush_all()
         sample_pcs = [f'example-pc-{i}' for i in range(3)]
-        self._client.set(PCS_KEY, sample_pcs)
+        pcs = self._client.get(PCS_KEY)
+        for sample_pc in sample_pcs:
+            if sample_pc not in pcs:
+                pcs.append(sample_pc)
+        self._client.set(PCS_KEY, pcs)
         # generate sample data
         for pc in sample_pcs:
             pc_data_keys = []
@@ -129,7 +133,7 @@ class Cache:
         keys = self._client.get(pcname)
         print(f"{len(keys)=}")
         if keys and len(keys) > 0:
-            key = keys[0]
+            key = keys[len(keys)-1]
             print(f"{key=}")
             result = self._client.get(key)
             print(f"{result=}")
