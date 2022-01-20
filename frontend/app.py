@@ -61,8 +61,6 @@ def get_pcs():
     return handleJsonResponse(cache.get_pcs())
 
 
-
-
 @app.route('/pc/<pcname>', methods=['GET'])
 def get_pc_dataEntries(pcname, lasthours):
     cache = mc.Cache()
@@ -88,11 +86,12 @@ def get_pc_graph(pcname, resourcetype=resource_types[0]):
     lasthours = request.args.get("lasthours", 1, type=int)
     graphFilename = f'img/{pcname}_{resourcetype}_-{lasthours}h.png'
     try:
-        
+
         df = get_pc_stats_df(pcname, lasthours)
 
         fig, ax = plt.subplots()
         fig.autofmt_xdate()
+        # plt.tight_layout()
         unit = ''
         duration = ''
 
@@ -106,9 +105,9 @@ def get_pc_graph(pcname, resourcetype=resource_types[0]):
         if 'load' in resourcetype:
             ax.set_ylim(0, 100)
             unit = '[%]'
-
-        ax.set(xlabel='', ylabel=f'{resourcetype} {unit}',
-               title=f'{resourcetype} of {pcname} in last {duration}')
+        # ylabel=f'{resourcetype} {unit}', xlabel='',
+        ax.set(
+            title=f'{resourcetype} of {pcname} in last {duration}')
 
         if len(df) > 1000:
             df = df.groupby('date_h').mean().reset_index()

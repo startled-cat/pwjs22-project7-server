@@ -20,12 +20,15 @@
     <title>PC Web Monitor</title>
     <script>
         window.onload = function () {
-            var image = document.getElementById("chart-image");
+            var images = document.querySelectorAll(".chart-image");
             var check = document.getElementById("refresh-checkbox");
 
             function updateImage() {
                 if (check.checked) {
-                    image.src = image.src.split("?")[0] + "?" + new Date().getTime();
+                    images.forEach(image => {
+                        image.src = image.src.split("?")[0] + "?" + new Date().getTime();
+
+                    })
                 }
 
             }
@@ -130,29 +133,15 @@
                             onclick="window.location.assign('/?pc={{ pc }}&view=1&resource={{ resource }}');">Last
                         1h</button>
                     <button type="button"
-                            class="btn btn-secondary {% if view == 2 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=2&resource={{ resource }}');">Today</button>
+                            class="btn btn-secondary {% if view == 24 %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view=24&resource={{ resource }}');">Today</button>
                     <button type="button"
-                            class="btn btn-secondary {% if view == 3 %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view=3&resource={{ resource }}');">This
+                            class="btn btn-secondary {% if view == 168 %}active{% endif %}"
+                            onclick="window.location.assign('/?pc={{ pc }}&view=168&resource={{ resource }}');">This
                         week</button>
                 </div>
             </div>
-            <div class="col">
 
-
-
-                <div class="btn-group"
-                     role="group"
-                     aria-label="Basic example">
-                    {% for resource_type in resource_types %}
-                    <button type="button"
-                            class="btn btn-secondary {% if resource == resource_type %}active{% endif %}"
-                            onclick="window.location.assign('/?pc={{ pc }}&view={{ view }}&resource={{resource_type}}');">{{resource_type}}</button>
-                    {% endfor %}
-
-                </div>
-            </div>
             <div class="col">
                 <div class="form-check form-switch">
                     <input class="form-check-input"
@@ -165,26 +154,6 @@
 
         </div>
 
-        <div class="row p-1">
-            <div class="col-sm">
-            </div>
-            <div class="col-sm">
-                {% if view == 1 %}
-                <img id="chart-image"
-                     src="/pc/{{ pc }}/graph/{{ resource }}?lasthours=1"></img>
-                {% endif %}
-                {% if view == 2 %}
-                <img id="chart-image"
-                     src="/pc/{{ pc }}/graph/{{ resource }}?lasthours=24"></img>
-                {% endif %}
-                {% if view == 3 %}
-                <img id="chart-image"
-                     src="/pc/{{ pc }}/graph/{{ resource }}?lasthours=168"></img>
-                {% endif %}
-            </div>
-            <div class="col-sm">
-            </div>
-        </div>
 
 
         {% else %}
@@ -192,6 +161,29 @@
         {% endif %}
 
     </div>
+    <div class="container-fluid">
+        <div class="row p-0">
+            {% for resource_type in resource_types %}
+            <div class="col-xl-6 col-md-6 col-sm-12 p-0">
+                <a href="/pc/{{ pc }}/graph/{{ resource_type }}?lasthours={{view}}">
+                    <img class="chart-image"
+                         style="max-width:100%;
+                max-height:100%"
+                         src="/pc/{{ pc }}/graph/{{ resource_type }}?lasthours={{view}}"></img>
+
+                </a>
+
+
+
+
+
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
