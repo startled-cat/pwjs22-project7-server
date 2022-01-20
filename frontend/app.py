@@ -8,7 +8,11 @@ import matplotlib.dates as mdates
 from datetime import datetime
 import memcached as mc
 import pandas as pd
-
+import io
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib
+matplotlib.use('Agg')
 PORT = int(os.environ.get('PORT', 8080))
 
 app = Flask(__name__)
@@ -122,7 +126,10 @@ def get_pc_graph(pcname, resourcetype=resource_types[0]):
         ax.xaxis.set_major_formatter(xfmt)
 
         plt.savefig(graphFilename)
-        return send_file(graphFilename, mimetype='image/png')
+        output = io.BytesIO()
+        FigureCanvas(fig).print_png(output)
+        return Response(output.getvalue(), mimetype='image/png')
+        # return send_file(graphFilename, mimetype='image/png')
     except:
         return send_file(graphFilename, mimetype='image/png')
 
