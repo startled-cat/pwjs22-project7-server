@@ -158,17 +158,17 @@
         <form class="form-check-inline">
           <div class="form-group">
             <button type="button"
-                  class="btn btn-secondary"
-                  onclick="
+                    class="btn btn-secondary"
+                    onclick="
                         document.querySelectorAll('.chart-image').forEach(x=> {x.src = x.src.split('&')[0] + '&' + new Date().getTime();})">Refresh
-            now</button>
+              now</button>
           </div>
           <div class="form-group form-check form-switch">
             <input class="form-check-input"
-                 type="checkbox"
-                 id="refresh-checkbox">
-          <label class="form-check-label"
-                 for="refresh-checkbox">Auto refresh</label>
+                   type="checkbox"
+                   id="refresh-checkbox">
+            <label class="form-check-label"
+                   for="refresh-checkbox">Auto refresh</label>
           </div>
         </form>
 
@@ -180,9 +180,7 @@
 
 
 
-    {% else %}
-    choose pc from dropdown in navbar
-    {% endif %}
+
 
   </div>
   <div class="container-fluid">
@@ -207,6 +205,9 @@
 
     </div>
   </div>
+  {% else %}
+  choose pc from dropdown in navbar
+  {% endif %}
 
 
 
