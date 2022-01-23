@@ -87,14 +87,16 @@ def getPcStats():
 
 
 if __name__ == '__main__':
-    MC_ADDRESS = 'localhost'
-    MC_PORT = 11211
+    # MC_ADDRESS = 'localhost'
+    # MC_PORT = 11211
     PC_KEY = platform.uname().node
     pc_data_keys = []
     loppForEver = False
     sleepFor = 0
+    
+    pcname = PC_KEY if len(sys.argv) < 3 else sys.argv[2]
 
-    print(f"pc name: {PC_KEY}")
+    print(f"pc name: {pcname}")
 
     cache = mc.Cache()
 
@@ -108,14 +110,13 @@ if __name__ == '__main__':
             sys.exit()
     except:
         pass
-
-
     
-
+    
+    
     while True:
         data = getPcStats()
-        cache.add_pc(PC_KEY)
-        data = cache.add_stats(PC_KEY, data)
+        cache.add_pc(pcname)
+        data = cache.add_stats(pcname, data)
         print(f"memcached key: {data['key']}")
 
         if not loppForEver:
